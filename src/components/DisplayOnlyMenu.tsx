@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Text, useInput, useApp } from 'ink'
+import { Box, Text } from 'ink'
 
 type Section = 'home' | 'about' | 'experience' | 'projects' | 'skills' | 'contact'
 
@@ -14,13 +14,9 @@ const SECTIONS: { key: Section; label: string; hotkey: string }[] = [
 
 const WAVE_FRAMES = ['◇', '◆', '◇', '◈']
 
-export default function MenuScreen() {
+export default function DisplayOnlyMenu() {
   const [currentSection, setCurrentSection] = useState<Section>('home')
-  const [selectedIndex, setSelectedIndex] = useState(0)
   const [waveFrame, setWaveFrame] = useState(0)
-  const [inputText, setInputText] = useState('')
-  const [isSearchMode, setIsSearchMode] = useState(false)
-  const { exit } = useApp()
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,60 +25,17 @@ export default function MenuScreen() {
     return () => clearInterval(timer)
   }, [])
 
-  // Auto-demo mode when input isn't available
+  // Auto-cycle through sections
   useEffect(() => {
-    if (!process.stdin.isTTY) {
-      const timer = setInterval(() => {
-        setCurrentSection(prev => {
-          const currentIndex = SECTIONS.findIndex(s => s.key === prev)
-          const nextIndex = (currentIndex + 1) % SECTIONS.length
-          return SECTIONS[nextIndex].key
-        })
-      }, 3000)
-      return () => clearInterval(timer)
-    }
+    const timer = setInterval(() => {
+      setCurrentSection(prev => {
+        const currentIndex = SECTIONS.findIndex(s => s.key === prev)
+        const nextIndex = (currentIndex + 1) % SECTIONS.length
+        return SECTIONS[nextIndex].key
+      })
+    }, 4000)
+    return () => clearInterval(timer)
   }, [])
-
-  // Input handling for TTY environments
-  useInput((input, key) => {
-    if (key.escape || (key.ctrl && input === 'c')) {
-      if (isSearchMode) {
-        setIsSearchMode(false)
-        setInputText('')
-      } else {
-        exit()
-      }
-      return
-    }
-
-    if (isSearchMode) {
-      if (key.return) {
-        setIsSearchMode(false)
-        setInputText('')
-      } else if (key.backspace || key.delete) {
-        setInputText(prev => prev.slice(0, -1))
-      } else if (input && input.length === 1) {
-        setInputText(prev => prev + input)
-      }
-      return
-    }
-
-    if (key.upArrow) {
-      setSelectedIndex(prev => (prev > 0 ? prev - 1 : SECTIONS.length - 1))
-    } else if (key.downArrow) {
-      setSelectedIndex(prev => (prev + 1) % SECTIONS.length)
-    } else if (key.return) {
-      setCurrentSection(SECTIONS[selectedIndex].key)
-    } else if (input === '/') {
-      setIsSearchMode(true)
-    } else {
-      const section = SECTIONS.find(s => s.hotkey === input.toLowerCase())
-      if (section) {
-        setCurrentSection(section.key)
-        setSelectedIndex(SECTIONS.findIndex(s => s.key === section.key))
-      }
-    }
-  })
 
   const renderHeader = () => (
     <Box borderStyle="double" borderColor="#BF00FF" padding={1} marginBottom={1}>
@@ -98,16 +51,10 @@ export default function MenuScreen() {
   const renderNavigation = () => (
     <Box borderStyle="single" borderColor="#4B0082" padding={1} marginBottom={1}>
       <Box flexDirection="row" justifyContent="space-between">
-        {SECTIONS.map((section, index) => (
+        {SECTIONS.map(section => (
           <Box key={section.key} marginRight={1}>
             <Text
-              color={
-                currentSection === section.key
-                  ? '#BF00FF'
-                  : selectedIndex === index
-                    ? '#8A2BE2'
-                    : '#DDA0DD'
-              }
+              color={currentSection === section.key ? '#BF00FF' : '#DDA0DD'}
               bold={currentSection === section.key}
             >
               [{section.hotkey}] {section.label}
@@ -332,13 +279,8 @@ export default function MenuScreen() {
 
   const renderFooter = () => (
     <Box borderStyle="single" borderColor="#4B0082" padding={1} marginTop={1}>
-      <Box flexDirection="row" justifyContent="space-between">
-        <Text color="#DDA0DD">Navigation: ↑↓ arrows, [hotkeys], Enter | Search: / | Exit: Esc</Text>
-        {isSearchMode && (
-          <Box>
-            <Text color="#BF00FF">Search: {inputText}</Text>
-          </Box>
-        )}
+      <Box flexDirection="row" justifyContent="center">
+        <Text color="#DDA0DD">Auto-cycling through sections • Portfolio Demo Mode</Text>
       </Box>
     </Box>
   )

@@ -1,24 +1,19 @@
 import { useState, useEffect } from 'react'
 import { Box, Text, useInput } from 'ink'
 
-// Initialize stdin for proper input handling
-process.stdin.setRawMode?.(true)
-process.stdin.resume()
-process.stdin.setEncoding('utf8')
-
 interface WelcomeScreenProps {
-  onComplete: (name?: string) => void
+  onComplete: () => void
 }
 
 const BOOT_MESSAGES = [
-  'Initializing kernel modules...',
-  'Loading device drivers...',
-  'Starting network services...',
-  'Mounting filesystems...',
-  'Loading development environment...',
-  'Initializing package managers...',
-  'Starting code servers...',
-  'System ready for development!'
+  'Initializing portfolio system...',
+  'Loading personal data...',
+  'Starting web services...',
+  'Mounting project files...',
+  'Loading development history...',
+  'Initializing skill modules...',
+  'Starting experience engine...',
+  'Portfolio ready for exploration!'
 ]
 
 const ASCII_BANNER = `
@@ -31,24 +26,21 @@ const ASCII_BANNER = `
 ║  ██║ ╚═╝ ██║╚██████╔╝██║  ██║██║███████╗       ██║   ╚██████╔╝██║     ║
 ║  ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝       ╚═╝    ╚═════╝ ╚═╝     ║
 ║                                                                       ║
-║                   ~ S U R F I N G   E N T R O P Y   S T A T E S ~     ║
+║                   ~ F U L L - S T A C K   P O R T F O L I O ~         ║
 ║                                                                       ║
 ╚═══════════════════════════════════════════════════════════════════════╝`
 
 const LOADING_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
 const WAVE_FRAMES = ['~', '~~', '~~~', '~~~~', '~~~~~', '~~~~~~', '~~~~~~~']
 
-type ScreenState = 'booting' | 'banner' | 'nameInput' | 'welcome' | 'completed'
+type ScreenState = 'booting' | 'banner' | 'welcome' | 'completed'
 
 export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   const [state, setState] = useState<ScreenState>('booting')
   const [currentMessage, setCurrentMessage] = useState(0)
   const [progress, setProgress] = useState(0)
-  const [name, setName] = useState('')
-  const [isInputMode, setIsInputMode] = useState(false)
   const [loadingFrame, setLoadingFrame] = useState(0)
   const [waveFrame, setWaveFrame] = useState(0)
-  const [showCursor, setShowCursor] = useState(true)
 
   // Loading animation
   useEffect(() => {
@@ -56,14 +48,6 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       setLoadingFrame(prev => (prev + 1) % LOADING_FRAMES.length)
       setWaveFrame(prev => (prev + 1) % WAVE_FRAMES.length)
     }, 150)
-    return () => clearInterval(timer)
-  }, [])
-
-  // Cursor blinking
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setShowCursor(prev => !prev)
-    }, 500)
     return () => clearInterval(timer)
   }, [])
 
@@ -86,18 +70,28 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
     return () => clearInterval(timer)
   }, [state])
 
-  // Auto-transition from banner to name input
+  // Auto-transition from banner to welcome
   useEffect(() => {
     if (state === 'banner') {
       const timer = setTimeout(() => {
-        setState('nameInput')
-        setIsInputMode(true)
+        setState('welcome')
       }, 3000)
       return () => clearTimeout(timer)
     }
   }, [state])
 
-  // Handle input with improved logic
+  // Auto-advance for non-TTY environments
+  useEffect(() => {
+    if (!process.stdin.isTTY && state === 'welcome') {
+      const timer = setTimeout(() => {
+        setState('completed')
+        onComplete()
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [state, onComplete])
+
+  // Handle input for TTY environments
   useInput((input, key) => {
     if (input === 'q' || input === 'Q' || key.escape || (key.ctrl && input === 'c')) {
       setTimeout(() => {
@@ -106,43 +100,36 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       return
     }
 
-    if (state === 'nameInput') {
-      if (key.return) {
-        setIsInputMode(false)
-        setState('welcome')
-        setTimeout(() => {
-          setState('completed')
-          onComplete(name.trim() || undefined)
-        }, 2500)
-      } else if (key.backspace) {
-        setName(prev => prev.slice(0, -1))
-      } else if (input && input.length === 1 && input !== 'q' && input !== 'Q') {
-        setName(prev => prev + input)
-      }
-    } else if (state === 'welcome' || state === 'completed') {
+    if (state === 'welcome') {
       setState('completed')
-      onComplete(name.trim() || undefined)
+      setTimeout(() => {
+        onComplete()
+      }, 500)
     }
   })
 
   const renderBootScreen = () => (
-    <Box flexDirection="column" alignItems="center" borderStyle="round" borderColor="#B0C4DE" padding={2}>
+    <Box
+      flexDirection="column"
+      alignItems="center"
+      borderStyle="round"
+      borderColor="#8A2BE2"
+      padding={2}
+    >
       <Box marginBottom={2}>
-        <Text color="#B0E0E6" bold>
-          ◆ DEVELOPMENT SYSTEM BOOT SEQUENCE ◆
+        <Text color="#E6E6FA" bold>
+          ◆ PORTFOLIO SYSTEM BOOT SEQUENCE ◆
         </Text>
       </Box>
 
       <Box flexDirection="column" width={50}>
         {BOOT_MESSAGES.slice(0, currentMessage + 1).map((message, index) => (
           <Box key={`boot-message-${message.slice(0, 15)}`} marginBottom={1}>
-            <Text color="#4682B4">
+            <Text color="#BF00FF">
               [{index === currentMessage ? LOADING_FRAMES[loadingFrame] : '●'}]
             </Text>
             <Box marginLeft={1}>
-              <Text color={index === currentMessage ? "#B0E0E6" : "#708090"}>
-                {message}
-              </Text>
+              <Text color={index === currentMessage ? '#E6E6FA' : '#DDA0DD'}>{message}</Text>
             </Box>
           </Box>
         ))}
@@ -150,15 +137,15 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
       {currentMessage < BOOT_MESSAGES.length - 1 && (
         <Box marginTop={3} flexDirection="column" alignItems="center">
-          <Text color="#B0E0E6">
-            System Loading: {Math.round(progress)}%
-          </Text>
+          <Text color="#E6E6FA">System Loading: {Math.round(progress)}%</Text>
           <Box marginTop={1}>
-            <Text color="#4682B4">
+            <Text color="#BF00FF">
               {'█'.repeat(Math.floor(progress / 2.5))}
-              <Text color="#B0C4DE">
+              <Text color="#8A2BE2">
                 {'▓'.repeat(Math.floor((100 - progress) / 10))}
-                {'░'.repeat(Math.max(0, 40 - Math.floor(progress / 2.5) - Math.floor((100 - progress) / 10)))}
+                {'░'.repeat(
+                  Math.max(0, 40 - Math.floor(progress / 2.5) - Math.floor((100 - progress) / 10))
+                )}
               </Text>
             </Text>
           </Box>
@@ -169,80 +156,50 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
   const renderBanner = () => (
     <Box flexDirection="column" alignItems="center">
-      <Box borderStyle="double" borderColor="#4682B4" padding={1}>
-        <Text color="#B0E0E6">{ASCII_BANNER}</Text>
+      <Box borderStyle="double" borderColor="#BF00FF" padding={1}>
+        <Text color="#E6E6FA">{ASCII_BANNER}</Text>
       </Box>
       <Box marginTop={2}>
-        <Text color="#B0E0E6">
-          {WAVE_FRAMES[waveFrame]} Welcome to Mohil's Development Environment {WAVE_FRAMES[waveFrame]}
+        <Text color="#E6E6FA">
+          {WAVE_FRAMES[waveFrame]} Welcome to Mohil's Portfolio {WAVE_FRAMES[waveFrame]}
         </Text>
       </Box>
       <Box marginTop={1}>
-        <Text color="#708090">Full-stack developer • System architect • Code craftsman</Text>
-      </Box>
-    </Box>
-  )
-
-  const renderNameInput = () => (
-    <Box flexDirection="column" alignItems="center">
-      <Box borderStyle="round" borderColor="#B0C4DE" padding={1}>
-        <Text color="#B0E0E6">{ASCII_BANNER}</Text>
-      </Box>
-
-      <Box marginTop={3} marginBottom={2} borderStyle="single" borderColor="#708090" padding={1}>
-        <Text color="#4682B4">◇ USER AUTHENTICATION PROTOCOL ◇</Text>
-      </Box>
-
-      <Box marginBottom={2}>
-        <Text color="#B0E0E6">Enter your username for personalized experience:</Text>
-      </Box>
-
-      <Box borderStyle="round" borderColor="#4682B4" padding={1} width={40}>
-        <Text color="#708090">$ </Text>
-        <Text color="#FFFAFA">{name}</Text>
-        {isInputMode && showCursor && <Text color="#B0E0E6">█</Text>}
-        {!isInputMode && <Text color="#708090"> (processing...)</Text>}
-      </Box>
-
-      <Box marginTop={2} flexDirection="column" alignItems="center">
-        <Text color="#708090">Press ENTER to continue • Leave empty for guest access</Text>
-        <Text color="#708090">Press 'q' or Ctrl+C to exit</Text>
+        <Text color="#DDA0DD">Full-stack developer • DevOps engineer • AI enthusiast</Text>
       </Box>
     </Box>
   )
 
   const renderWelcome = () => (
     <Box flexDirection="column" alignItems="center">
-      <Box borderStyle="double" borderColor="#4682B4" padding={1}>
-        <Text color="#B0E0E6">{ASCII_BANNER}</Text>
+      <Box borderStyle="double" borderColor="#BF00FF" padding={1}>
+        <Text color="#E6E6FA">{ASCII_BANNER}</Text>
       </Box>
 
-      <Box marginTop={3} borderStyle="round" borderColor="#B0E0E6" padding={2}>
+      <Box marginTop={3} borderStyle="round" borderColor="#8A2BE2" padding={2}>
         <Box flexDirection="column" alignItems="center">
-          <Text color="#4682B4" bold>
-            ◆ SESSION INITIALIZED SUCCESSFULLY ◆
+          <Text color="#BF00FF" bold>
+            ◆ PORTFOLIO SYSTEM READY ◆
           </Text>
           <Box marginTop={1}>
-            <Text color="#FFFAFA" bold>
-              Welcome, {name.trim() ? name.trim() : 'Guest User'}!
+            <Text color="#E6E6FA" bold>
+              Welcome to Mohil Garg's Digital Portfolio
             </Text>
           </Box>
           <Box marginTop={1}>
-            <Text color="#708090">
-              Development environment ready for exploration
-            </Text>
+            <Text color="#DDA0DD">Full-Stack & DevOps Engineer • Ready for exploration</Text>
           </Box>
         </Box>
       </Box>
 
       <Box marginTop={2}>
-        <Text color="#B0C4DE">
+        <Text color="#8A2BE2">
           {WAVE_FRAMES[waveFrame]} Loading main interface {WAVE_FRAMES[waveFrame]}
         </Text>
       </Box>
 
       <Box marginTop={2}>
-        <Text color="#708090">Press any key to continue...</Text>
+        <Text color="#DDA0DD">Press any key to continue...</Text>
       </Box>
     </Box>
   )
@@ -252,8 +209,6 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       return renderBootScreen()
     case 'banner':
       return renderBanner()
-    case 'nameInput':
-      return renderNameInput()
     case 'welcome':
     case 'completed':
       return renderWelcome()
