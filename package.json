@@ -1,9 +1,9 @@
 {
   "name": "personal-tui",
-  "module": "src/index.tsx",
+  "module": "src/App.tsx",
   "type": "module",
   "scripts": {
-    "start": "bun run src/index.tsx",
+    "start": "bun run src/App.tsx",
     "lint": "biome lint .",
     "format": "biome check --write ."
   },
