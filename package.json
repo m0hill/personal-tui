@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run src/App.tsx",
+    "build": "bun build src/App.tsx --compile --outfile personal-tui",
     "lint": "biome lint .",
     "format": "biome check --write ."
   },
