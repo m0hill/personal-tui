@@ -2,10 +2,21 @@
   "name": "personal-tui",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome check --write ."
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@biomejs/biome": "^2.0.0",
+    "@types/bun": "latest",
+    "@types/react": "^19.1.8",
+    "react-devtools-core": "^6.1.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "ink": "^6.0.0",
+    "react": "^19.1.0"
   }
 }

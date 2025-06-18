@@ -1,1 +1,1 @@
-console.log("Hello via Bun!");
+console.log('Press "q" to exit, or any other key to continue...')
