@@ -17,8 +17,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "drizzle-kit": "^0.31.1",
-    "drizzle-orm": "^0.44.2",
     "ink": "^6.0.0",
     "react": "^19.1.0"
   }

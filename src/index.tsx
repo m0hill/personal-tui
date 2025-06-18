@@ -1,87 +1,50 @@
 import { useState, useEffect } from 'react'
 import { render, Box, Text } from 'ink'
-import WelcomeScreen from './components/WelcomeScreen'
-import { initializeDatabase, trackVisitor, getTotalVisitorCount } from './database/db'
+import WelcomeScreen from './components/WelcomeScreen.js'
+import MenuScreen from './components/MenuScreen.js'
 
-type AppState = 'loading' | 'welcome' | 'main'
+type AppState = 'loading' | 'welcome' | 'menu'
 
 function App() {
   const [state, setState] = useState<AppState>('loading')
-  const [visitorCount, setVisitorCount] = useState(0)
-  const [error, setError] = useState<string | null>(null)
+  const [userName, setUserName] = useState<string | undefined>()
 
   useEffect(() => {
-    async function initialize() {
-      try {
-        // Initialize database
-        initializeDatabase()
+    // Simulate initialization delay
+    const timer = setTimeout(() => {
+      setState('welcome')
+    }, 1500)
 
-        // Get current visitor count
-        const count = await getTotalVisitorCount()
-        setVisitorCount(count)
-
-        setState('welcome')
-      } catch (err) {
-        console.error('Initialization error:', err)
-        setError(err instanceof Error ? err.message : 'Unknown error')
-      }
-    }
-
-    initialize()
+    return () => clearInterval(timer)
   }, [])
 
-  const handleWelcomeComplete = async (name?: string) => {
-    try {
-      // Track the visitor
-      await trackVisitor(name)
-
-      // Update visitor count
-      const count = await getTotalVisitorCount()
-      setVisitorCount(count)
-
-      setState('main')
-    } catch (err) {
-      console.error('Error tracking visitor:', err)
-      setError(err instanceof Error ? err.message : 'Unknown error')
-    }
-  }
-
-  if (error) {
-    return (
-      <Box flexDirection="column" alignItems="center" marginTop={2}>
-        <Text color="red" bold>
-          Error: {error}
-        </Text>
-        <Text color="gray">Please check your setup and try again.</Text>
-      </Box>
-    )
+  const handleWelcomeComplete = (name?: string) => {
+    setUserName(name)
+    setState('menu')
   }
 
   if (state === 'loading') {
     return (
-      <Box flexDirection="column" alignItems="center" marginTop={2}>
-        <Text color="cyan">Initializing database...</Text>
+      <Box flexDirection="column" alignItems="center" justifyContent="center" height={10}>
+        <Box borderStyle="round" borderColor="#B0C4DE" padding={2}>
+          <Text color="#B0E0E6">◇ Initializing Digital Consciousness ◇</Text>
+        </Box>
+        <Box marginTop={1}>
+          <Text color="#708090">Connecting to entropy matrix...</Text>
+        </Box>
       </Box>
     )
   }
 
   if (state === 'welcome') {
-    return <WelcomeScreen onComplete={handleWelcomeComplete} visitorCount={visitorCount} />
+    return <WelcomeScreen onComplete={handleWelcomeComplete} />
   }
 
-  // Main application screen (placeholder for now)
-  return (
-    <Box flexDirection="column" alignItems="center" marginTop={2}>
-      <Text color="green" bold>
-        🎉 Welcome to the main application!
-      </Text>
-      <Text color="gray">This is where your TUI website content will go.</Text>
-      <Text color="gray">Total visitors: {visitorCount}</Text>
-      <Box marginTop={2}>
-        <Text color="yellow">Press Ctrl+C to exit</Text>
-      </Box>
-    </Box>
-  )
+  if (state === 'menu') {
+    return <MenuScreen userName={userName} />
+  }
+
+  return null
 }
 
 render(<App />)
