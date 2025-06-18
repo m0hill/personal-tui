@@ -5,33 +5,37 @@ interface WelcomeScreenProps {
   onComplete: () => void
 }
 
-const BOOT_MESSAGES = [
-  'Initializing portfolio system...',
-  'Loading personal data...',
-  'Starting web services...',
-  'Mounting project files...',
-  'Loading development history...',
-  'Initializing skill modules...',
-  'Starting experience engine...',
-  'Portfolio ready for exploration!'
-]
+const BOOT_MESSAGES = ['Loading personal data...', 'Portfolio ready for exploration!']
 
 const ASCII_BANNER = `
-╔═══════════════════════════════════════════════════════════════════════╗
-║                                                                       ║
-║  ███╗   ███╗ ██████╗ ██╗  ██╗██╗██╗         ████████╗██╗   ██╗██╗     ║
-║  ████╗ ████║██╔═══██╗██║  ██║██║██║         ╚══██╔══╝██║   ██║██║     ║
-║  ██╔████╔██║██║   ██║███████║██║██║            ██║   ██║   ██║██║     ║
-║  ██║╚██╔╝██║██║   ██║██╔══██║██║██║            ██║   ██║   ██║██║     ║
-║  ██║ ╚═╝ ██║╚██████╔╝██║  ██║██║███████╗       ██║   ╚██████╔╝██║     ║
-║  ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝       ╚═╝    ╚═════╝ ╚═╝     ║
-║                                                                       ║
-║                   ~ F U L L - S T A C K   P O R T F O L I O ~         ║
-║                                                                       ║
-╚═══════════════════════════════════════════════════════════════════════╝`
+   ╭─────────────────────────────────────────────────╮
+   │    ███    ███  ██████  ██   ██ ██ ██           │
+   │    ████  ████ ██    ██ ██   ██ ██ ██           │
+   │    ██ ████ ██ ██    ██ ███████ ██ ██           │
+   │    ██  ██  ██ ██    ██ ██   ██ ██ ██           │
+   │    ██      ██  ██████  ██   ██ ██ ███████      │
+   │                                                │
+   │       ~ R E T R O   P O R T F O L I O ~         │
+   ╰─────────────────────────────────────────────────╯`
 
 const LOADING_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
 const WAVE_FRAMES = ['~', '~~', '~~~', '~~~~', '~~~~~', '~~~~~~', '~~~~~~~']
+const RETRO_COLORS = {
+  neonPink: '#FF10F0',
+  neonCyan: '#10FFFF',
+  neonGreen: '#39FF14',
+  neonYellow: '#FFFF00',
+  neonOrange: '#FF6600',
+  neonPurple: '#BF00FF',
+  retroBlue: '#0080FF',
+  retroRed: '#FF0040',
+  softPink: '#FFB3DA',
+  softCyan: '#B3FFFF',
+  softGreen: '#B3FFB3',
+  darkPurple: '#4B0082',
+  deepMagenta: '#8B008B',
+  electricBlue: '#7DF9FF'
+}
 
 type ScreenState = 'booting' | 'banner' | 'welcome' | 'completed'
 
@@ -65,7 +69,7 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
         return next
       })
       setProgress(prev => Math.min(prev + 100 / BOOT_MESSAGES.length, 100))
-    }, 600)
+    }, 800)
 
     return () => clearInterval(timer)
   }, [state])
@@ -75,7 +79,7 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
     if (state === 'banner') {
       const timer = setTimeout(() => {
         setState('welcome')
-      }, 3000)
+      }, 2000)
       return () => clearTimeout(timer)
     }
   }, [state])
@@ -113,11 +117,11 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       flexDirection="column"
       alignItems="center"
       borderStyle="round"
-      borderColor="#8A2BE2"
+      borderColor={RETRO_COLORS.neonCyan}
       padding={2}
     >
       <Box marginBottom={2}>
-        <Text color="#E6E6FA" bold>
+        <Text color={RETRO_COLORS.neonPink} bold>
           ◆ PORTFOLIO SYSTEM BOOT SEQUENCE ◆
         </Text>
       </Box>
@@ -125,11 +129,15 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       <Box flexDirection="column" width={50}>
         {BOOT_MESSAGES.slice(0, currentMessage + 1).map((message, index) => (
           <Box key={`boot-message-${message.slice(0, 15)}`} marginBottom={1}>
-            <Text color="#BF00FF">
+            <Text color={RETRO_COLORS.neonGreen}>
               [{index === currentMessage ? LOADING_FRAMES[loadingFrame] : '●'}]
             </Text>
             <Box marginLeft={1}>
-              <Text color={index === currentMessage ? '#E6E6FA' : '#DDA0DD'}>{message}</Text>
+              <Text
+                color={index === currentMessage ? RETRO_COLORS.neonYellow : RETRO_COLORS.softCyan}
+              >
+                {message}
+              </Text>
             </Box>
           </Box>
         ))}
@@ -137,11 +145,11 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
       {currentMessage < BOOT_MESSAGES.length - 1 && (
         <Box marginTop={3} flexDirection="column" alignItems="center">
-          <Text color="#E6E6FA">System Loading: {Math.round(progress)}%</Text>
+          <Text color={RETRO_COLORS.neonCyan}>System Loading: {Math.round(progress)}%</Text>
           <Box marginTop={1}>
-            <Text color="#BF00FF">
+            <Text color={RETRO_COLORS.neonPink}>
               {'█'.repeat(Math.floor(progress / 2.5))}
-              <Text color="#8A2BE2">
+              <Text color={RETRO_COLORS.neonGreen}>
                 {'▓'.repeat(Math.floor((100 - progress) / 10))}
                 {'░'.repeat(
                   Math.max(0, 40 - Math.floor(progress / 2.5) - Math.floor((100 - progress) / 10))
@@ -156,50 +164,54 @@ export default function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
   const renderBanner = () => (
     <Box flexDirection="column" alignItems="center">
-      <Box borderStyle="double" borderColor="#BF00FF" padding={1}>
-        <Text color="#E6E6FA">{ASCII_BANNER}</Text>
+      <Box borderStyle="double" borderColor={RETRO_COLORS.neonYellow} padding={1}>
+        <Text color={RETRO_COLORS.neonCyan}>{ASCII_BANNER}</Text>
       </Box>
       <Box marginTop={2}>
-        <Text color="#E6E6FA">
+        <Text color={RETRO_COLORS.neonPink}>
           {WAVE_FRAMES[waveFrame]} Welcome to Mohil's Portfolio {WAVE_FRAMES[waveFrame]}
         </Text>
       </Box>
       <Box marginTop={1}>
-        <Text color="#DDA0DD">Full-stack developer • DevOps engineer • AI enthusiast</Text>
+        <Text color={RETRO_COLORS.electricBlue}>
+          Full-stack developer • DevOps engineer • AI enthusiast
+        </Text>
       </Box>
     </Box>
   )
 
   const renderWelcome = () => (
     <Box flexDirection="column" alignItems="center">
-      <Box borderStyle="double" borderColor="#BF00FF" padding={1}>
-        <Text color="#E6E6FA">{ASCII_BANNER}</Text>
+      <Box borderStyle="double" borderColor={RETRO_COLORS.neonPink} padding={1}>
+        <Text color={RETRO_COLORS.neonGreen}>{ASCII_BANNER}</Text>
       </Box>
 
-      <Box marginTop={3} borderStyle="round" borderColor="#8A2BE2" padding={2}>
+      <Box marginTop={3} borderStyle="round" borderColor={RETRO_COLORS.neonCyan} padding={2}>
         <Box flexDirection="column" alignItems="center">
-          <Text color="#BF00FF" bold>
+          <Text color={RETRO_COLORS.neonYellow} bold>
             ◆ PORTFOLIO SYSTEM READY ◆
           </Text>
           <Box marginTop={1}>
-            <Text color="#E6E6FA" bold>
+            <Text color={RETRO_COLORS.neonPink} bold>
               Welcome to Mohil Garg's Digital Portfolio
             </Text>
           </Box>
           <Box marginTop={1}>
-            <Text color="#DDA0DD">Full-Stack & DevOps Engineer • Ready for exploration</Text>
+            <Text color={RETRO_COLORS.electricBlue}>
+              Full-Stack & DevOps Engineer • Ready for exploration
+            </Text>
           </Box>
         </Box>
       </Box>
 
       <Box marginTop={2}>
-        <Text color="#8A2BE2">
+        <Text color={RETRO_COLORS.neonOrange}>
           {WAVE_FRAMES[waveFrame]} Loading main interface {WAVE_FRAMES[waveFrame]}
         </Text>
       </Box>
 
       <Box marginTop={2}>
-        <Text color="#DDA0DD">Press any key to continue...</Text>
+        <Text color={RETRO_COLORS.softCyan}>Press any key to continue...</Text>
       </Box>
     </Box>
   )
